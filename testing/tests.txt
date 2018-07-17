@@ -1,0 +1,9 @@
+https://lichess.org/analysis/1k2b3/ppp5/8/8/8/8/1P6/1K3R2_w_-_-
+<----- stockoutpin.txt
+
+https://lichess.org/analysis/r2k1bnr/pppb1ppp/2p2q2/8/4P2P/2N5/PPP2PP1/R1BQKB1R_w_KQk_-
+<----- stockoutpin2.txt
+
+https://lichess.org/analysis/5nk1/5ppp/5q2/4r3/8/8/5PPP/R1B2QK1_w_-_-
+<----- stockpincentre.txt
+
