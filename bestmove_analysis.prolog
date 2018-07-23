@@ -1,4 +1,87 @@
-%%%%%%%%%%%%%%%%%%%      MAIN     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%     INCLUDES      %%%%%%%%%%%%%%%%%%%%%%%
+
+%:- ['./RTEC-master/src/RTEC.prolog'].
+
+%%%%%%%%%%%%%%%%%%%      ChessBoard States     %%%%%%%%%%%%%%%%%%%%%
+
+play_moves(InputFEN, Moves, [State | NextStates], Pins, Centre, Outfile):-
+	initialize_state(InputFEN, State),
+	open(Outfile, write, Stream),
+	writeState(Stream, State),
+	play_next_moves(State, Moves, NextStates, Pins, Centre, Stream),
+	close(Stream).
+
+play_next_moves(_,[],[],[],[],_).
+
+play_next_moves(State, [Move | NextMoves], [NewState | NextStates], [Pins | NextPins], [[Side, Pieces_on_Centre_Squares, Pieces_Controlling_the_Centre, WhiteScore, BlackScore] | NextCentre], Stream):-
+	string_chars(Move, ParsedMove), 
+        fix_indexes(ParsedMove, FixedMove),
+        identify_piece(FixedMove, State, Piece,_,_),
+        play_move(State, FixedMove, Piece,  NewState),
+	chessboard_pins(NewState, Pins),
+	chessboard_centre_control(NewState, Side, Pieces_on_Centre_Squares, Pieces_Controlling_the_Centre, WhiteScore, BlackScore),
+	nl(Stream),
+	writeState(Stream, NewState),
+	nl(Stream),
+	write(Stream,"PINS FOUND ON THE BOARD ABOVE ARE: "),
+	write(Stream, Pins),
+	nl(Stream),
+	write(Stream, "CENTRE CONTROL: "),
+	write(Stream, Side),
+	nl(Stream),
+	write(Stream, "WHITE FORCES CONTROLLING THE CENTRE: "),
+	write(Stream, WhiteScore),
+	nl(Stream),
+	write(Stream, "BLACK FORCES CONTROLLING THE CENTRE: "),
+	write(Stream, BlackScore),
+	nl(Stream),
+	play_next_moves(NewState, NextMoves, NextStates, NextPins, NextCentre, Stream).
+
+%initially(ChessBoard = [['r'],['n']]).
+
+%%%%%%%%%%%%%%%%%%%     FIND ALL PINS ON THE BOARD      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+chessboard_pins(State, Pins):-
+	identify_all_pins(State, 0, Pins_Dirty),
+	clean_pins(Pins_Dirty, Pins).
+	
+clean_pins([], []).
+
+clean_pins([H|T],  Pins):-
+	length(H, 0),
+	!, 
+	clean_pins(T, Pins).
+
+clean_pins([H|T],[H|Pins]):-
+	clean_pins(T, Pins).	
+
+identify_all_pins(_,8,[]):- !.
+
+identify_all_pins(State, Rank, [Pins_on_this_rank | OtherPins]):-
+	find_all_pins_rank(State, Rank, 0, Pins_on_this_rank),
+	NewRank is Rank + 1,
+	identify_all_pins(State, NewRank, OtherPins).
+
+find_all_pins_rank(_, _, 8, []):- !.
+
+find_all_pins_rank(State, Rank, File, Pins):-
+	identify_piece([Rank, File], State, Piece),
+	identify_pin(Piece, Rank, File,State, Pins_Empty),
+	length(Pins_Empty,0),
+	!,
+	NewFile is File + 1, 
+	find_all_pins_rank(State, Rank, NewFile, Pins).
+
+find_all_pins_rank(State, Rank, File, [Pins_entry  | OtherPins_on_this_rank]):-
+	identify_piece([Rank, File], State, Piece),
+	identify_pin(Piece, Rank, File, State, Pins_by_this_piece),
+	index_to_square([Rank, File],Square),
+	nth0(0, Pins_entry, Square, Pins_by_this_piece),
+	NewFile is File + 1,
+	find_all_pins_rank(State, Rank, NewFile, OtherPins_on_this_rank).			
+
+
+%%%%%%%%%%%%%%%%%%%      Move_Analysis (Before-After for piece moved)     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 move_Analysis(Stockout_File, InputFEN, Strategy, OutFile):-
 
@@ -26,11 +109,18 @@ move_Analysis(Stockout_File, InputFEN, Strategy, OutFile):-
 
 	identify_pin(Piece, NewRank, NewFile, NewState, Pins), % ColouringPins),
 
-        append([ControlsTheCentre, Pins], Strategy),
+        append([ControlsTheCentre, Pins], Strategy).
 	
-	states_in_file(OutFile, State, NewState). %%  Colouring).	
+%states_in_file(OutFile, State, NewState). %%  Colouring).	
 
 %%%%%%%%%%%%%%%%%%%%%%     THE PIN     %%%%%%%%%%%%%%%%%%%%%%%%%%%
+identify_pin(' ',_,_,_,[]):- !.
+identify_pin('p',_,_,_,[]):- !.
+identify_pin('P',_,_,_,[]):- !.
+identify_pin('k',_,_,_,[]):- !.
+identify_pin('K',_,_,_,[]):- !.
+identify_pin('n',_,_,_,[]):- !.
+identify_pin('N',_,_,_,[]):- !.
 
 identify_pin(Piece, Rank, File, State, Pins):- 
 	colour(Piece, Colour),
@@ -89,7 +179,7 @@ find_pinned_pieces('r', Rank, File, State, [H|T], [[AttackedPiece, PinnedTo, rel
 	evaluate(AttackedPiece, AttackedEval), 
 	evaluate(PinnedTo, PinnedToEval),
 	PinnedToEval > AttackedEval, !, 	
-	find_pinned_pieces('R', Rank, File, State, T, Tail).
+	find_pinned_pieces('r', Rank, File, State, T, Tail).
 	
 find_pinned_pieces('r', Rank, File, State, [_|T], Pins):-
 	find_pinned_pieces('r', Rank, File, State, T, Pins).
@@ -117,7 +207,7 @@ find_pinned_pieces('B', Rank, File, State, [H|T], [[AttackedPiece, PinnedTo, rel
 	colour(PinnedTo, black),
 	evaluate(AttackedPiece, AttackedEval), 
 	evaluate(PinnedTo, PinnedToEval),
-	PinnedToEval > AttackedEval, !, 	
+	PinnedToEval > AttackedEval, !,
 	find_pinned_pieces('B', Rank, File, State, T, Tail).
 	
 find_pinned_pieces('B', Rank, File, State, [_|T], Pins):-
@@ -231,7 +321,7 @@ pinned_toR([Rank, File], south, State, PinnedTo):-
 	pinned_toR([NewRank, File], south, State, PinnedTo).
 
 pinned_toR([Rank, File], south, State, PinnedTo):-
-	NewRank is Rank - 1,
+	NewRank is Rank + 1,
 	identify_piece([NewRank, File], State, PinnedTo).
 
 pinned_toR([_,0], west, _, ' '):- !.
@@ -259,8 +349,100 @@ pinned_toR([Rank, File], east, State, PinnedTo):-
 	identify_piece([Rank, NewFile], State, PinnedTo).	
 
 %%%%%%%%%%%%%%%%%%%%%%     CENTRE CONTROL     %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+chessboard_centre_control(ChessBoard, Side, Pieces_on_Centre_Squares, Pieces_Controlling_the_Centre, WhiteScore, BlackScore):-
+	identify_pieces_on_centre_squares(ChessBoard, Pieces_on_Centre_Squares),
+	evaluate_centre_pieces(Pieces_on_Centre_Squares, 0, 0, WhiteScore1, BlackScore1),
+	identify_pieces_controlling_centre(ChessBoard, 0, Pieces_Controlling_the_Centre, 0, 0, WhiteScore2, BlackScore2),
+	WhiteScore is WhiteScore1 + WhiteScore2,
+	BlackScore is BlackScore1 + BlackScore2, 
+	check_centre_scores(WhiteScore, BlackScore, Side).
 
-identify_centre_control(Piece, Rank, File, NewRank, NewFile, State, NewState, ControlsTheCentre):- %% ColoursStart, Colouring):-	
+check_centre_scores(WhiteScore, BlackScore, white_controls_the_centre):-
+	WhiteScore > BlackScore, !.
+
+check_centre_scores(WhiteScore, BlackScore, black_controls_the_centre):-
+	BlackScore > WhiteScore, !.
+
+check_centre_scores(_, _, centre_equally_controlled).	
+
+identify_pieces_controlling_centre(_, 8, [], WhiteScore, BlackScore, WhiteScore, BlackScore):- !.
+
+identify_pieces_controlling_centre(ChessBoard, Rank, [Centre_Controlling_on_Rank | Tail], WTemp, BTemp, WhiteScore, BlackScore):-
+	check_centre_control(ChessBoard, Rank, 0, Centre_Controlling_on_Rank, WTemp, BTemp, NewW, NewB), !,
+	NewRank is Rank + 1, 
+	identify_pieces_controlling_centre(ChessBoard, NewRank, Tail, NewW, NewB, WhiteScore, BlackScore).
+
+
+check_centre_control(_, _, 8, [], WhiteScore, BlackScore, WhiteScore, BlackScore):- !.
+
+check_centre_control(ChessBoard, Rank, File, [[Piece,Square]|T] , WTemp, BTemp, WhiteScore, BlackScore):-
+	identify_piece([Rank,File], ChessBoard, Piece),
+	piece_real_control_squares(Piece, Rank, File,ChessBoard, CtrlSquares),  
+	controls_a_centre_square(CtrlSquares),!,
+	index_to_square([Rank,File], Square),
+	centre_control_squares(Piece, CtrlSquares, WTemp, BTemp, NewW, NewB),
+	NewFile is File + 1,
+	check_centre_control(ChessBoard, Rank, NewFile, T, NewW, NewB, WhiteScore, BlackScore).
+
+	
+check_centre_control(ChessBoard, Rank, File, Pieces_Controlling_the_Centre, WTemp, BTemp, WhiteScore, BlackScore):-
+	NewFile is File + 1,
+	check_centre_control(ChessBoard, Rank, NewFile, Pieces_Controlling_the_Centre, WTemp, BTemp, WhiteScore, BlackScore).
+
+controls_a_centre_square([H|_]):-
+	centre_square(H),!.
+
+controls_a_centre_square([_|T]):-
+	controls_a_centre_square(T).
+
+centre_control_squares(_,[], WhiteScore, BlackScore, WhiteScore, BlackScore).
+
+centre_control_squares(Piece, [H|T], WTemp, BTemp, WhiteScore, BlackScore):-
+	centre_square(H),
+	colour(Piece, white),!,
+	NewW is WTemp + 1, 
+	centre_control_squares(Piece, T, NewW, BTemp, WhiteScore, BlackScore).	
+
+centre_control_squares(Piece, [H|T], WTemp, BTemp, WhiteScore, BlackScore):-
+	centre_square(H),!,
+	NewB is BTemp + 1,
+	centre_control_squares(Piece, T, WTemp, NewB, WhiteScore, BlackScore).	
+
+centre_control_squares(Piece, [_|T], WTemp, BTemp, WhiteScore, BlackScore):-
+	centre_control_squares(Piece, T, WTemp, BTemp, WhiteScore, BlackScore).
+
+%% CHECK AGAIN %% 
+
+evaluate_centre_pieces([], WhiteScore, BlackScore, WhiteScore, BlackScore).
+
+evaluate_centre_pieces([[Piece,_]|T], WTemp, BTemp,  WhiteScore, BlackScore):-
+	colour(Piece, white),!,
+	NewW is WTemp + 1,
+	evaluate_centre_pieces(T, NewW, BTemp, WhiteScore, BlackScore). 
+
+evaluate_centre_pieces([_ | T], WTemp, BTemp, WhiteScore, BlackScore):-
+	NewB is BTemp + 1,
+	evaluate_centre_pieces(T, WTemp, NewB, WhiteScore, BlackScore).	
+
+identify_pieces_on_centre_squares(ChessBoard, CentrePieces):-
+	identify_piece([3,3], ChessBoard, D5Piece),
+	identify_piece([3,4], ChessBoard, E5Piece),
+	identify_piece([4,3], ChessBoard, D4Piece),
+	identify_piece([4,4], ChessBoard, E4Piece),
+	CentreTemp = [[D5Piece,"d5"], [E5Piece, "e5"],[D4Piece, "d4"],[E4Piece, "e4"]],
+	fix_pieces_on_centre_squares(CentreTemp, CentrePieces).
+
+fix_pieces_on_centre_squares([],[]).
+
+fix_pieces_on_centre_squares([[Piece, _]|T], CentrePieces):-
+	Piece  = ' ',
+	!,
+	fix_pieces_on_centre_squares(T, CentrePieces).
+
+fix_pieces_on_centre_squares([H|T], [H|Tail]):-
+	fix_pieces_on_centre_squares(T, Tail).
+
+identify_centre_control(Piece, Rank, File, NewRank, NewFile, State, NewState, ControlsTheCentre):-	
 	piece_control_squares(Piece, Rank, File, AllPossibleCtrlSquaresBefore), 
 	remove_blocked_squares(Piece, Rank, File, State, AllPossibleCtrlSquaresBefore, BlockedList, []),
 	subtract(AllPossibleCtrlSquaresBefore, BlockedList, CtrlSquaresBefore), %Only for Queen, Rook, Bishop
@@ -300,6 +482,11 @@ iscentresquare([4,4],Count, NewCount):-
 	NewCount is Count + 1, !.
 
 iscentresquare(_,Count, Count).
+
+centre_square([3,3]).
+centre_square([3,4]).
+centre_square([4,3]).
+centre_square([4,4]).
 
 %%%%%%%%%%%%%%%%%%%%%%%     PLAY MOVE     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -369,6 +556,218 @@ readLastLine(Stream,_,LastLine):-
 :- discontiguous piece_control_squares/4.
 :- discontiguous remove_blocked_squares/7.
 
+%%%%%%%%%%%%%%%%%%%%%%%     GAME PHASES     %%%%%%%%%%%%%%%%%%%%%%%%%%
+identify_game_phase(_, MovesNo, opening):-
+	MovesNo < 20, !.
+
+identify_game_phase(ChessBoard, _, middlegame):-
+        traded_queens(ChessBoard, notTraded), 
+	find_material_with_evaluation(ChessBoard, [_, [WhiteKnights, WhiteLight, WhiteDark],[WhiteRooks],[_]],[_, [BlackKnights, BlackLight, BlackDark], [BlackRooks], [_]], _, _),
+	S is WhiteKnights + WhiteLight + WhiteDark + WhiteRooks + BlackKnights + BlackLight + BlackDark + BlackRooks,
+	S > 2, !.
+
+identify_game_phase(ChessBoard, _, endgame):-
+	traded_queens(ChessBoard, notTraded), !.
+
+identify_game_phase(ChessBoard, _, queenless_middlegame):-
+	traded_queens(ChessBoard, traded),
+	find_material_with_evaluation(ChessBoard, [_, [WhiteKnights, WhiteLight, WhiteDark],[WhiteRooks],[_]],[_, [BlackKnights, BlackLight, BlackDark], [BlackRooks], [_]], _, _),
+	S is WhiteKnights + WhiteLight + WhiteDark + WhiteRooks + BlackKnights + BlackLight + BlackDark + BlackRooks,
+	S > 8, !.	
+
+
+identify_game_phase(ChessBoard, _, endgame):-
+        traded_queens(ChessBoard, traded).
+	
+traded_queens([], traded).
+
+traded_queens([H|T], Queens):-
+	no_queens_on_rank(H),!,
+	traded_queens(T, Queens).
+
+traded_queens([_|_], notTraded).
+
+no_queens_on_rank([]).
+
+no_queens_on_rank(['Q'|_]):-
+	!,fail.
+no_queens_on_rank(['q'|_]):-
+	!, fail.
+
+no_queens_on_rank([_|T]):-
+	no_queens_on_rank(T).
+
+%%%%%%%%%%%%%%%%%%%%%%      FIND ALIVE PIECES     %%%%%%%%%%%%%%%%%%%%%%%%%%%
+find_material_with_evaluation(ChessBoard, [[WAPawn, WBPawn, WCPawn, WDPawn, WEPawn, WFPawn, WGPawn, WHPawn], [WhiteKnights, WhiteLight, WhiteDark], [WhiteRooks], [WhiteQueens]],[[BAPawn, BBPawn, BCPawn, BDPawn, BEPawn, BFPawn, BGPawn, BHPawn], [BlackKnights, BlackLight, BlackDark], [BlackRooks], [BlackQueens]], WhiteScore, BlackScore):-
+	find_alive_pawns(ChessBoard, WAPawn, WBPawn, WCPawn, WDPawn, WEPawn, WFPawn, WGPawn, WHPawn, BAPawn, BBPawn, BCPawn, BDPawn,BEPawn, BFPawn, BGPawn, BHPawn),
+	find_alive_pieces(ChessBoard, WhiteKnights, BlackKnights, WhiteLight, WhiteDark, BlackLight, BlackDark, WhiteRooks, BlackRooks, WhiteQueens, BlackQueens),
+	material_evaluation(ChessBoard, 0, 0, WhiteScore, BlackScore).	
+
+find_alive_pawns(ChessBoard, WAPawn, WBPawn, WCPawn, WDPawn, WEPawn, WFPawn, WGPawn, WHPawn, BAPawn, BBPawn, BCPawn, BDPawn,BEPawn, BFPawn, BGPawn, BHPawn):-
+	find_nth_pawn(ChessBoard, 0, 0, 0, WAPawn, BAPawn),
+	find_nth_pawn(ChessBoard, 1, 0, 0, WBPawn, BBPawn),
+	find_nth_pawn(ChessBoard, 2, 0, 0, WCPawn, BCPawn),
+	find_nth_pawn(ChessBoard, 3, 0, 0, WDPawn, BDPawn),
+	find_nth_pawn(ChessBoard, 4, 0, 0, WEPawn, BEPawn),
+	find_nth_pawn(ChessBoard, 5, 0, 0, WFPawn, BFPawn),
+	find_nth_pawn(ChessBoard, 6, 0, 0, WGPawn, BGPawn),
+	find_nth_pawn(ChessBoard, 7, 0, 0, WHPawn, BHPawn).
+
+find_nth_pawn([], _, CountW, CountB, CountW, CountB).
+
+find_nth_pawn([H|T], N, WTemp, BTemp, CountW, CountB):-
+	find_nth_pawn_rank(H, N, WTemp, BTemp, NewW, NewB),
+	find_nth_pawn(T, N, NewW, NewB, CountW, CountB).
+	
+find_nth_pawn_rank(RankList, N, WTemp, BTemp, WTemp, NewB):-
+	nth0(N, RankList, 'p'), !,
+	NewB is BTemp + 1.
+
+find_nth_pawn_rank(RankList, N, WTemp, BTemp, NewW, BTemp):-
+        nth0(N, RankList, 'P'), !,
+        NewW is WTemp + 1.
+	
+find_nth_pawn_rank(_, _, W, B, W, B).
+	
+find_alive_pieces(ChessBoard, WhiteKnights, BlackKnights, WhiteLight, WhiteDark, BlackLight, BlackDark, WhiteRooks, BlackRooks, WhiteQueens, BlackQueens):-
+	find_alive_knights(ChessBoard, 0, 0, WhiteKnights, BlackKnights),
+	find_alive_rooks(ChessBoard, 0, 0, WhiteRooks, BlackRooks),
+	find_alive_queens(ChessBoard, 0, 0, WhiteQueens, BlackQueens),
+	find_alive_bishops(ChessBoard, 0, 0, 0, 0, 0, 0, WhiteLight, WhiteDark, BlackLight, BlackDark).
+
+find_alive_bishops(_,8,_, WL, WD, BL, BD, WL, WD, BL, BD):- !.
+
+find_alive_bishops(ChessBoard, Rank, File, WLTemp, WDTemp, BLTemp, BDTemp, WhiteLight, WhiteDark, BlackLight, BlackDark):-
+	nth0(Rank, ChessBoard, RankList),
+	find_bishops_rank(RankList, Rank, File, WLTemp, WDTemp, BLTemp, BDTemp, NewWL, NewWD, NewBL, NewBD),
+	NewRank is Rank + 1,
+	find_alive_bishops(ChessBoard, NewRank, File, NewWL, NewWD, NewBL, NewBD, WhiteLight, WhiteDark, BlackLight, BlackDark).
+
+find_bishops_rank(_,_,8, WL, WD, BL, BD, WL, WD, BL, BD):- !.
+
+find_bishops_rank(RankList, Rank, File, WLTemp, WDTemp, BLTemp, BDTemp, WhiteLight, WhiteDark, BlackLight, BlackDark):-
+	nth0(File, RankList, 'B'),
+	colour(Rank, File, light), !, 
+	NewWL is WLTemp + 1, 
+	NewFile is File + 1,
+	find_bishops_rank(RankList, Rank, NewFile, NewWL, WDTemp, BLTemp, BDTemp, WhiteLight, WhiteDark, BlackLight, BlackDark).
+
+find_bishops_rank(RankList, Rank, File, WLTemp, WDTemp, BLTemp, BDTemp, WhiteLight, WhiteDark, BlackLight, BlackDark):-
+        nth0(File, RankList, 'B'),
+        colour(Rank, File, dark), !,
+        NewWD is WDTemp + 1,
+        NewFile is File + 1,
+        find_bishops_rank(RankList, Rank, NewFile, WLTemp, NewWD, BLTemp, BDTemp, WhiteLight, WhiteDark, BlackLight, BlackDark).
+
+find_bishops_rank(RankList, Rank, File, WLTemp, WDTemp, BLTemp, BDTemp, WhiteLight, WhiteDark, BlackLight, BlackDark):-
+        nth0(File, RankList, 'b'),
+        colour(Rank, File, light), !,
+        NewBL is BLTemp + 1,
+        NewFile is File + 1,
+        find_bishops_rank(RankList, Rank, NewFile, WLTemp, WDTemp, NewBL, BDTemp, WhiteLight, WhiteDark, BlackLight, BlackDark).
+
+find_bishops_rank(RankList, Rank, File, WLTemp, WDTemp, BLTemp, BDTemp, WhiteLight, WhiteDark, BlackLight, BlackDark):-
+        nth0(File, RankList, 'b'),
+        colour(Rank, File, dark), !,
+        NewBD is BDTemp + 1,
+        NewFile is File + 1,
+        find_bishops_rank(RankList, Rank, NewFile, WLTemp, WDTemp, BLTemp, NewBD, WhiteLight, WhiteDark, BlackLight, BlackDark).
+
+find_bishops_rank(RankList, Rank, File, WLTemp, WDTemp, BLTemp, BDTemp, WhiteLight, WhiteDark, BlackLight, BlackDark):-
+	NewFile is File + 1,
+	find_bishops_rank(RankList, Rank, NewFile, WLTemp, WDTemp, BLTemp, BDTemp, WhiteLight, WhiteDark, BlackLight, BlackDark).
+
+find_alive_queens([], WhiteQueens, BlackQueens, WhiteQueens, BlackQueens).
+
+find_alive_queens([H|T], WTemp, BTemp, WhiteQueens, BlackQueens):-
+	find_queens_rank(H, WTemp, BTemp, NewW, NewB),
+	find_alive_queens(T, NewW, NewB, WhiteQueens, BlackQueens).
+
+find_queens_rank([], WhiteQueens, BlackQueens, WhiteQueens, BlackQueens).
+
+find_queens_rank(['q'|T], WTemp, BTemp, WhiteQueens, BlackQueens):-
+	NewB is BTemp + 1, !, 
+	find_queens_rank(T, WTemp, NewB, WhiteQueens, BlackQueens).
+	
+find_queens_rank(['Q'|T], WTemp, BTemp, WhiteQueens, BlackQueens):-
+	NewW is WTemp + 1, !, 
+	find_queens_rank(T, NewW, BTemp, WhiteQueens, BlackQueens).
+
+find_queens_rank([_|T], WTemp, BTemp, WhiteQueens, BlackQueens):- 
+	find_queens_rank(T, WTemp, BTemp, WhiteQueens, BlackQueens).
+
+find_alive_knights([], WhiteKnights, BlackKnights, WhiteKnights, BlackKnights).
+
+find_alive_knights([H|T], WTemp, BTemp, WhiteKnights, BlackKnights):-
+	find_knights_rank(H, WTemp, BTemp, NewW, NewB),
+	find_alive_knights(T, NewW, NewB, WhiteKnights, BlackKnights).  
+	
+find_knights_rank([], WhiteKnights, BlackKnights, WhiteKnights, BlackKnights).
+
+find_knights_rank(['n'|T], WTemp, BTemp, WhiteKnights, BlackKnights):-
+	NewB is BTemp + 1, !, 
+	find_knights_rank(T, WTemp, NewB, WhiteKnights, BlackKnights).
+	
+find_knights_rank(['N'|T], WTemp, BTemp, WhiteKnights, BlackKnights):-
+	NewW is WTemp + 1, !,
+	find_knights_rank(T, NewW, BTemp, WhiteKnights, BlackKnights).
+
+find_knights_rank([_|T], WTemp, BTemp, WhiteKnights, BlackKnights):-
+	find_knights_rank(T, WTemp, BTemp, WhiteKnights, BlackKnights).
+
+find_alive_rooks([], WhiteMinorPieces, BlackMinorPieces, WhiteMinorPieces, BlackMinorPieces).
+
+find_alive_rooks([H|T], WTemp, BTemp, WhiteMinorPieces, BlackMinorPieces):-
+	find_rooks_rank(H, WTemp, BTemp, NewW, NewB),
+	find_alive_rooks(T, NewW, NewB, WhiteMinorPieces, BlackMinorPieces).
+
+find_rooks_rank([], WhiteMinorPieces, BlackMinorPieces, WhiteMinorPieces, BlackMinorPieces).
+
+find_rooks_rank(['r'|T], WTemp, BTemp, WhiteMinorPieces, BlackMinorPieces):-
+	NewB is BTemp + 1, !,
+	find_rooks_rank(T, WTemp, NewB, WhiteMinorPieces, BlackMinorPieces).
+	
+find_rooks_rank(['R'|T], WTemp, BTemp, WhiteMinorPieces, BlackMinorPieces):-
+	NewW is WTemp + 1, !,
+	find_rooks_rank(T, NewW, BTemp, WhiteMinorPieces, BlackMinorPieces).
+
+find_rooks_rank([_|T], WTemp, BTemp, WhiteMinorPieces, BlackMinorPieces):-
+	find_rooks_rank(T, WTemp, BTemp, WhiteMinorPieces, BlackMinorPieces).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%     MATERIAL EVAL      %%%%%%%%%%%%%%%%%%%%%%%%%%
+
+material_evaluation([], WhiteScore, BlackScore, WhiteScore, BlackScore).
+
+material_evaluation([H|T], WHelp, BHelp, WhiteScore, BlackScore):-
+	material_on_rank(H, WHelp, BHelp, NewW, NewB), 
+	material_evaluation(T, NewW, NewB, WhiteScore, BlackScore).
+
+material_on_rank([], WhiteScore, BlackScore, WhiteScore, BlackScore).
+
+material_on_rank(['K'|T], WHelp, BHelp, WhiteScore, BlackScore):-
+	!,
+	material_on_rank(T, WHelp, BHelp, WhiteScore, BlackScore).
+
+material_on_rank(['k'|T], WHelp, BHelp, WhiteScore, BlackScore):-
+	!,
+	material_on_rank(T, WHelp, BHelp, WhiteScore, BlackScore).
+
+material_on_rank([' '|T], WHelp, BHelp, WhiteScore, BlackScore):-
+	!,
+	material_on_rank(T, WHelp, BHelp, WhiteScore, BlackScore).
+
+material_on_rank([H|T], WHelp, BHelp, WhiteScore, BlackScore):-
+	colour(H, white), !,
+	evaluate(H, Eval),
+	NewW is WHelp + Eval,
+	material_on_rank(T, NewW, BHelp, WhiteScore, BlackScore).
+
+material_on_rank([H|T], WHelp, BHelp, WhiteScore, BlackScore):-
+	evaluate(H, Eval),
+	NewB is BHelp + Eval, 
+	material_on_rank(T, WHelp, NewB, WhiteScore, BlackScore).
+
 %%%%%%%%%%%%%%%%%%%%%%%     ATTACKED PIECES     %%%%%%%%%%%%%%%%%%%%%%%%%
 
 attacked_pieces(_, _, [], []):- !.
@@ -397,18 +796,24 @@ attacked_pieces(Colour, State, [H|T], [AttackedPiece | Tail]):-
 
 %%%%%%%%%%%%%%%%%%%%%%%     BLOCKED SQUARES     %%%%%%%%%%%%%%%%%%%%%%%%%
 
+piece_real_control_squares(Piece, Rank, File, ChessBoard, CtrlSquares):-
+ 	piece_control_squares(Piece, Rank, File, AllPossibleCtrlSquares),
+        remove_blocked_squares(Piece, Rank, File, ChessBoard, AllPossibleCtrlSquares, BlockedList, []),
+        subtract(AllPossibleCtrlSquares, BlockedList, CtrlSquares).
+
+
 remove_blocked_squares('R',_ , _, _, [], BlockedRes,BlockedRes):- !. 
 
 remove_blocked_squares('R', Rank, File, State, [H|T], BlockedRes, BlockedList):-
-	member(H, BlockedList),
-	remove_blocked_squares('R',Rank, File, State, T, BlockedRes, BlockedList), !.
+	member(H, BlockedList),!,
+	remove_blocked_squares('R',Rank, File, State, T, BlockedRes, BlockedList).
 
 remove_blocked_squares('R', Rank, File, State, [H|T], BlockedRes, BlockedList):-
 	identify_piece(H, State,' '),!,
-	remove_blocked_squares('R',Rank, File, State,T, BlockedRes, BlockedList), !.
+	remove_blocked_squares('R',Rank, File, State,T, BlockedRes, BlockedList).
 
 remove_blocked_squares('R', Rank, File, State, [H|T], BlockedRes, BlockedList):-
-	find_relative_positionR(Rank, File, H, Direction),
+	!,find_relative_positionR(Rank, File, H, Direction),
 	fix_blocked_list(H,Direction,NewBlocked),
 	append(BlockedList, NewBlocked, NewBlockedList),
 	remove_blocked_squares('R', Rank, File, State, T,BlockedRes, NewBlockedList).
@@ -416,15 +821,15 @@ remove_blocked_squares('R', Rank, File, State, [H|T], BlockedRes, BlockedList):-
 remove_blocked_squares('r',_ , _, _, [], BlockedRes,BlockedRes):- !.
 
 remove_blocked_squares('r', Rank, File, State, [H|T], BlockedRes, BlockedList):-
-        member(H, BlockedList),
-        remove_blocked_squares('r',Rank, File, State, T, BlockedRes, BlockedList), !.
+        member(H, BlockedList),!,
+        remove_blocked_squares('r',Rank, File, State, T, BlockedRes, BlockedList).
 
 remove_blocked_squares('r', Rank, File, State, [H|T], BlockedRes, BlockedList):-
         identify_piece(H, State,' '),!,
-        remove_blocked_squares('r',Rank, File, State,T, BlockedRes, BlockedList), !.
+        remove_blocked_squares('r',Rank, File, State,T, BlockedRes, BlockedList).
 
 remove_blocked_squares('r', Rank, File, State, [H|T], BlockedRes, BlockedList):-
-        find_relative_positionR(Rank, File, H, Direction),
+       !, find_relative_positionR(Rank, File, H, Direction),
         fix_blocked_list(H,Direction,NewBlocked),
         append(BlockedList, NewBlocked, NewBlockedList),
         remove_blocked_squares('r', Rank, File, State, T,BlockedRes, NewBlockedList).
@@ -507,15 +912,15 @@ find_relative_positionR(_, File, [_, Target_File], west):-
 remove_blocked_squares('B',_ , _, _, [], BlockedRes,BlockedRes):- !.
 
 remove_blocked_squares('B', Rank, File, State, [H|T], BlockedRes, BlockedList):-
-        member(H, BlockedList),
-        remove_blocked_squares('B',Rank, File, State, T, BlockedRes, BlockedList), !.
+        member(H, BlockedList), !,
+        remove_blocked_squares('B',Rank, File, State, T, BlockedRes, BlockedList).
 
 remove_blocked_squares('B', Rank, File, State, [H|T], BlockedRes, BlockedList):-
         identify_piece(H, State,' '),!,
-        remove_blocked_squares('B',Rank, File, State,T, BlockedRes, BlockedList), !.
+        remove_blocked_squares('B',Rank, File, State,T, BlockedRes, BlockedList).
 
 remove_blocked_squares('B', Rank, File, State, [H|T], BlockedRes, BlockedList):-
-        find_relative_positionB(Rank, File, H, Direction),
+        !,find_relative_positionB(Rank, File, H, Direction),
         fix_blocked_list(H,Direction,NewBlocked),
         append(BlockedList, NewBlocked, NewBlockedList),
         remove_blocked_squares('B', Rank, File, State, T,BlockedRes, NewBlockedList).
@@ -523,15 +928,15 @@ remove_blocked_squares('B', Rank, File, State, [H|T], BlockedRes, BlockedList):-
 remove_blocked_squares('b',_ , _, _, [], BlockedRes,BlockedRes):- !.
 
 remove_blocked_squares('b', Rank, File, State, [H|T], BlockedRes, BlockedList):-
-        member(H, BlockedList),
-        remove_blocked_squares('b',Rank, File, State, T, BlockedRes, BlockedList), !.
+        member(H, BlockedList), !,
+        remove_blocked_squares('b',Rank, File, State, T, BlockedRes, BlockedList).
 
 remove_blocked_squares('b', Rank, File, State, [H|T], BlockedRes, BlockedList):-
         identify_piece(H, State,' '),!,
-        remove_blocked_squares('b',Rank, File, State,T, BlockedRes, BlockedList), !.
+        remove_blocked_squares('b',Rank, File, State,T, BlockedRes, BlockedList).
 
 remove_blocked_squares('b', Rank, File, State, [H|T], BlockedRes, BlockedList):-
-        find_relative_positionB(Rank, File, H, Direction),
+        !,find_relative_positionB(Rank, File, H, Direction),
         fix_blocked_list(H,Direction,NewBlocked),
         append(BlockedList, NewBlocked, NewBlockedList),
         remove_blocked_squares('b', Rank, File, State, T,BlockedRes, NewBlockedList).
@@ -553,15 +958,17 @@ find_relative_positionB(Rank,File,[Target_Rank, Target_File], downright):-
         Target_File > File, !.
 
 remove_blocked_squares('Q',Rank, File, State, AllPossible, BlockedRes, BlockedList):-
+	!,
 	seperate_possible(AllPossible, Rank, File, AllDiagonal, AllHorVert),
 	remove_blocked_squares('B', Rank, File, State, AllDiagonal, BlockedRes1, BlockedList),
 	remove_blocked_squares('R', Rank, File, State, AllHorVert, BlockedRes2, BlockedList),
 	append(BlockedRes1, BlockedRes2, BlockedRes).
 
 remove_blocked_squares('q',Rank, File, State, AllPossible, BlockedRes, BlockedList):-
+	!,
         seperate_possible(AllPossible, Rank, File, AllDiagonal, AllHorVert),
-        remove_blocked_squares('B', Rank, File, State, AllDiagonal, BlockedRes1, BlockedList),
-        remove_blocked_squares('R', Rank, File, State, AllHorVert, BlockedRes2, BlockedList),
+        remove_blocked_squares('b', Rank, File, State, AllDiagonal, BlockedRes1, BlockedList),
+        remove_blocked_squares('r', Rank, File, State, AllHorVert, BlockedRes2, BlockedList),
         append(BlockedRes1, BlockedRes2, BlockedRes).
 
 seperate_possible([],_,_, [], []).
@@ -787,11 +1194,22 @@ piece_control_squares('Q',Rank, File, CtrlSquares):-
 	append(CtrlSquares1, CtrlSquares2, CtrlSquares). 
 
 piece_control_squares('q',Rank, File, CtrlSquares):-
-	piece_control_squares('B', Rank, File, CtrlSquares1),
-	piece_control_squares('R',Rank, File, CtrlSquares2 ),
+	piece_control_squares('b', Rank, File, CtrlSquares1),
+	piece_control_squares('r',Rank, File, CtrlSquares2 ),
 	append(CtrlSquares1, CtrlSquares2, CtrlSquares). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%     KNIGHTS     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+piece_control_squares('n',Rank, File, CtrlSquares):-
+        oneOClock_Square(Rank,File,OneResult),
+        twoOClock_Square(Rank,File,TwoResult),
+        fourOClock_Square(Rank,File,FourResult),
+        fiveOClock_Square(Rank,File,FiveResult),
+        sevenOClock_Square(Rank,File,SevenResult),
+        eightOClock_Square(Rank,File,EightResult),
+        tenOClock_Square(Rank,File,TenResult),
+        elevenOClock_Square(Rank,File,ElevenResult),
+        append([OneResult,TwoResult,FourResult,FiveResult,SevenResult,EightResult,TenResult,ElevenResult], CtrlSquares).
 
 piece_control_squares('N',Rank, File, CtrlSquares):-
 	oneOClock_Square(Rank,File,OneResult),
@@ -898,6 +1316,73 @@ file_mapping('f',5).
 file_mapping('g',6).
 file_mapping('h',7).
 
+%%%%%%%%%%%%%%%%%%%%     COORDINATES      %%%%%%%%%%%%%%%%%%%
+
+index_to_square([0,0], "a8").
+index_to_square([0,1],"b8").
+index_to_square([0,2],"c8").
+index_to_square([0,3],"d8").
+index_to_square([0,4],"e8").
+index_to_square([0,5],"f8").
+index_to_square([0,6],"g8").
+index_to_square([0,7],"h8").
+index_to_square([1,0],"a7").
+index_to_square([1,1],"b7").
+index_to_square([1,2],"c7").
+index_to_square([1,3],"d7").
+index_to_square([1,4],"e7").
+index_to_square([1,5],"f7").
+index_to_square([1,6],"g7").
+index_to_square([1,7],"h7").
+index_to_square([2,0],"a6").
+index_to_square([2,1],"b6").
+index_to_square([2,2],"c6").
+index_to_square([2,3],"d6").
+index_to_square([2,4],"e6").
+index_to_square([2,5],"f6").
+index_to_square([2,6],"g6").
+index_to_square([2,7],"h6").
+index_to_square([3,0],"a5").
+index_to_square([3,1],"b5").
+index_to_square([3,2],"c5").
+index_to_square([3,3],"d5").
+index_to_square([3,4],"e5").
+index_to_square([3,5],"f5").
+index_to_square([3,6],"g5").
+index_to_square([3,7],"h5").
+index_to_square([4,0],"a4").
+index_to_square([4,1],"b4").
+index_to_square([4,2],"c4").
+index_to_square([4,3],"d4").
+index_to_square([4,4],"e4").
+index_to_square([4,5],"f4").
+index_to_square([4,6],"g4").
+index_to_square([4,7],"h4").
+index_to_square([5,0],"a3").
+index_to_square([5,1],"b3").
+index_to_square([5,2],"c3").
+index_to_square([5,3],"d3").
+index_to_square([5,4],"e3").
+index_to_square([5,5],"f3").
+index_to_square([5,6],"g3").
+index_to_square([5,7],"h3").
+index_to_square([6,0],"a2").
+index_to_square([6,1],"b2").
+index_to_square([6,2],"c2").
+index_to_square([6,3],"d2").
+index_to_square([6,4],"e2").
+index_to_square([6,5],"f2").
+index_to_square([6,6],"g2").
+index_to_square([6,7],"h2").
+index_to_square([7,0],"a1").
+index_to_square([7,1],"b1").
+index_to_square([7,2],"c1").
+index_to_square([7,3],"d1").
+index_to_square([7,4],"e1").
+index_to_square([7,5],"f1").
+index_to_square([7,6],"g1").
+index_to_square([7,7],"h1").
+
 %%%%%%%%%%%%%%%%%%%%      EVALS     %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 evaluate('R', 5).
@@ -906,16 +1391,17 @@ evaluate('B', 3).
 evaluate('b', 3).
 evaluate('N', 3).
 evaluate('n', 3).
-evaluate('K', 1000).
-evaluate('k', 1000).
+evaluate('K', whiteking).
+evaluate('k', blackking).
 evaluate('Q', 9).
 evaluate('q', 9).
 evaluate('P', 1).
 evaluate('p', 1).
+evaluate(' ', 0).
 
 %%%%%%%%%%%%%%%%%%%%     COLOUR     %%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% CHESS %%%%%%
-
+%%%%% PIECES %%%%%
 colour('P', white).
 colour('p', black).
 colour('B', white).
@@ -933,6 +1419,16 @@ colour(' ', nocolour).
 reverse_colour(white, black).
 reverse_colour(black, white).
 reverse_colour(nocolour, nocolour).
+%%%%% SQUARES %%%%%
+colour(Rank, File, light):-
+	S is Rank + File,
+	K is S mod 2,
+	K is 0, !.
+
+colour(_, _, dark).
+
+
+
 %%%%% OUT %%%%%%
 
 start_colours([[7,7,7,7,7,7,7,7], [7,7,7,7,7,7,7,7], [7,7,7,7,7,7,7,7], [7,7,7,7,7,7,7,7], [7,7,7,7,7,7,7,7], [7,7,7,7,7,7,7,7], [7,7,7,7,7,7,7,7], [7,7,7,7,7,7,7,7]]).
