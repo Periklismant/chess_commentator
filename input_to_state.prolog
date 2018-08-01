@@ -1,8 +1,13 @@
 %%%%%%%%%%%%%%%%%%%%     FEN -> STATE      %%%%%%%%%%%%%%%%%%%%
 
-initialize_state(InputFEN, ChessBoard):- %FIX
+initialize_state(InputFEN, ChessBoard, Next_to_Play, Castling, En_Passant, Half_Moves, Moves_Count):- 
         fen_parser(InputFEN, InputList),
-        concat_ranks(InputList,8,[],ChessBoard).  %8 iterations to take each rank form inp to state
+        concat_ranks(InputList,8,[],ChessBoard),  %8 iterations to take each rank form inp to state
+	nth0(8, InputList, Next_to_Play),
+	nth0(9, InputList, Castling),
+	nth0(10, InputList, En_Passant), 
+	nth0(11, InputList, Half_Moves),
+	nth0(12, InputList, Moves_Count).
 
 fen_parser(Input, OutState):-
         split_string(Input, "/", "", RanksList), %RankLists has 8 elems, 8th  elem contains otherargs(wb, en passant,...)
@@ -25,7 +30,7 @@ fix_spaces([],Same,Same):-
         !.
 
 fix_spaces([H|T],Dummy,FixedPieces):-
-        char_type(H, digit),
+        char_type(H, digit),!,
         atom_number(H,NumofSpaces),
         insert_spaces(NumofSpaces,Dummy,New),
         fix_spaces(T,New,FixedPieces).

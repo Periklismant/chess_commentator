@@ -169,13 +169,19 @@ evaluate('B', 3).
 evaluate('b', 3).
 evaluate('N', 3).
 evaluate('n', 3).
-evaluate('K', whiteking).
-evaluate('k', blackking).
+evaluate('K', 1000).
+evaluate('k', 1000).
 evaluate('Q', 9).
 evaluate('q', 9).
 evaluate('P', 1).
 evaluate('p', 1).
 evaluate(' ', 0).
+
+pieces_to_evaluations([],[]).
+
+pieces_to_evaluations([H|T],[Head|Tail]):-
+	evaluate(H, Head),
+	pieces_to_evaluations(T,Tail).
 
 %%%%%%%%%%%%%%%%%%%%     COLOUR     %%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% CHESS %%%%%%
@@ -204,5 +210,44 @@ colour(Rank, File, light):-
         K is 0, !.
 
 colour(_, _, dark).
+
+%%%%% PLAYER %%%%%
+
+player_to_colour("w", white).
+player_to_colour("b", black).
+%%%%%%%%%%%%%%%%%%%  PIECE PATTERNS  %%%%%%%%%%%%%%%%%%%%%
+
+line_piece('R').
+line_piece('r').
+line_piece('Q').
+line_piece('q').
+
+diagonal_piece('B').
+diagonal_piece('b').
+diagonal_piece('Q').
+diagonal_piece('q').
+
+knight_piece('N').
+knight_piece('n').
+
+
+%%%%%%%%%%%%%%%   CASTLING    %%%%%%%%%%%%%%%
+
+kingside_white_available(['K'|_],available).
+
+queenside_white_available(['Q'|_], available):- !.
+
+queenside_white_available([_,T], Check_Availability):-
+	queenside_white_available(T, Check_Availability).
+
+kingside_black_available(['k'|_], available):- !.
+
+kingside_black_available([_,T], Check_Availability):-
+        queenside_white_available(T, Check_Availability).
+
+queenside_black_available(['q'|_], available):- !.
+
+queenside_black_available([_,T], Check_Availability):-
+        queenside_white_available(T, Check_Availability).
 
 
