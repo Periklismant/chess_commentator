@@ -3,7 +3,6 @@
 :- ['chessboard_basics.prolog'].
 :- ['control_squares.prolog'].
 
-
 %%%%%%   FINDS THREATS   %%%%%%
 identify_threats(ChessBoard, Next_to_Play, Threats):-
 	identify_all_threats(0, ChessBoard, Next_to_Play, Threats_with_Fake),
@@ -67,7 +66,6 @@ fix_threats_squares([[Rank, File, Score]|T],[[Square, Score]|Tail]):-
 	index_to_square([Rank,File], Square),
 	fix_threats_squares(T, Tail).
 
-%%%%%%  KINGS FIX!!!!!!!!!  %%%%%%
 check_for_threat(Rank, File, _, _, [], Score, [Rank, File, Score]):-
 	Score > 0, !.
 

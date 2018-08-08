@@ -1,8 +1,7 @@
-%%%%%%%%%%%%%   INCLUDES   %%%%%%%%%%%%`
+%%%%%%%%%%%%%   INCLUDES   %%%%%%%%%%%%
 
 :- ['./chessboard_basics.prolog'].
 :- ['./control_squares.prolog'].
-
 
 %%%%%%%%%%%%%%%%%%%     FIND ALL PINS AND SKEWERS ON THE BOARD      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -69,9 +68,7 @@ find_all_pins_and_skewers_rank(State, Rank, File, [Pins_entry | OtherPins_on_thi
         find_all_pins_and_skewers_rank(State, Rank, NewFile, OtherPins_on_this_rank, OtherSkewers_on_this_rank).
 
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%     THE PIN     %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%     THE PIN / THE SKEWER     %%%%%%%%%%%%%%%%%%%%%%%%%%%
 identify_pin_skewer(' ',_,_,_,[],[]):- !.
 identify_pin_skewer('p',_,_,_,[],[]):- !.
 identify_pin_skewer('P',_,_,_,[],[]):- !.
