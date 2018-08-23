@@ -211,8 +211,8 @@ evaluate(' ', 0).
 
 pieces_to_evaluations([],[]).
 
-pieces_to_evaluations([H|T],[Head|Tail]):-
-	evaluate(H, Head),
+pieces_to_evaluations([[Piece, Rank, File]|T],[[Evaluation, Rank, File]|Tail]):-
+	evaluate(Piece, Evaluation),
 	pieces_to_evaluations(T,Tail).
 
 %%%%%%%%%%%%%%%%%%%%     COLOUR     %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -261,6 +261,22 @@ diagonal_piece('q').
 
 knight_piece('N').
 knight_piece('n').
+
+%%%%%%%%%%%%%%%%%%   SYMBOL TO PIECE   %%%%%%%%%%%%%%%%%%
+
+get_piece('P', pawn).
+get_piece('p', pawn).
+get_piece('K', king).
+get_piece('k', king).
+get_piece('N', knight).
+get_piece('n', knight).
+get_piece('B', bishop).
+get_piece('b', bishop).
+get_piece('R', rook).
+get_piece('r', rook).
+get_piece('Q', queen).
+get_piece('q', queen).
+
 
 %%%%%%%%%%%%%%  DIAGONALS AND LINES  %%%%%%%%%%%%%%%%%%%%%%%
 
@@ -337,3 +353,61 @@ east_same_line_as([_, 7], []):- !.
 east_same_line_as([Rank, File], [[Rank, FilePos]|T]):-
 	FilePos is File + 1,
  	east_same_line_as([Rank, FilePos], T).
+
+remove_add_piece(State, Rank, File, NewPiece, NewState):-
+	nth0(Rank, State, RanktoChange, BuffState),
+	nth0(File, RanktoChange, _OldPiece, BuffRank),
+	nth0(File, ChangedRank, NewPiece, BuffRank),
+	nth0(Rank, NewState, ChangedRank, BuffState).
+
+%%%%%% COLOUR A PIECE %%%%%
+
+return_piece_colour(pawn, white, 'P'):- !.
+return_piece_colour(pawn, black, 'p').
+
+return_piece_colour(rook, white, 'R'):- !.
+return_piece_colour(rook, black, 'r').
+
+return_piece_colour(bishop, white, 'B'):- !.
+return_piece_colour(bishop, black, 'b').
+
+return_piece_colour(knight, white, 'N'):- !.
+return_piece_colour(knight, black, 'n').
+
+return_piece_colour(queen, white, 'Q'):- !.
+return_piece_colour(queen, black, 'q').
+
+return_piece_colour(king, white, 'K'):- !.
+return_piece_colour(king, black, 'k').
+
+%%%%%% PIECE FINDER %%%%%%% 
+
+find_certain_piece(_, _, 8, []):- !.
+
+find_certain_piece(Piece_To_Find, ChessBoard, Rank, Pieces_Found_List):-
+	find_certain_piece_rank(Piece_To_Find, ChessBoard, Rank, 0, Empty),
+	Empty = [],  !,
+	NewRank is Rank + 1,
+	find_certain_piece(Piece_To_Find, ChessBoard, NewRank, Pieces_Found_List).
+
+find_certain_piece(Piece_To_Find, ChessBoard, Rank, [Pieces_on_rank|Rest_Pieces]):-
+	find_certain_piece_rank(Piece_To_Find, ChessBoard, Rank, 0, Pieces_on_rank),
+	NewRank is Rank + 1,
+	find_certain_piece(Piece_To_Find, ChessBoard, NewRank, Rest_Pieces).
+
+find_certain_piece_rank(_, _, _, 8, []):- !.
+
+find_certain_piece_rank(Piece_To_Find, ChessBoard, Rank, File, [[Rank, File]|Rest_Pieces]):-
+	identify_piece([Rank, File], ChessBoard, Piece_To_Find), !, 
+	NewFile is File + 1,
+	find_certain_piece_rank(Piece_To_Find, ChessBoard, Rank, NewFile, Rest_Pieces).
+
+find_certain_piece_rank(Piece_To_Find, ChessBoard, Rank, File, Pieces_Found_List):-
+        NewFile is File + 1,
+        find_certain_piece_rank(Piece_To_Find, ChessBoard, Rank, NewFile, Pieces_Found_List).
+	
+%%%%%%%%%%  FOR SORTING  %%%%%%%%%%%%%	
+
+nthcompare(N, <, A, B):- nth1(N, A, X), nth1(N, B, Y), X @< Y.
+nthcompare(_, >, _, _).   %%%% for predsort
+

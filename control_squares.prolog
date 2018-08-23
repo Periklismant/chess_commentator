@@ -14,7 +14,6 @@ piece_real_control_squares(Piece, Rank, File, ChessBoard, CtrlSquares):-
         remove_blocked_squares(Piece, Rank, File, ChessBoard, AllPossibleCtrlSquares, BlockedList, []),
         subtract(AllPossibleCtrlSquares, BlockedList, CtrlSquares).
 
-
 remove_blocked_squares('R',_ , _, _, [], BlockedRes,BlockedRes):- !.
 
 remove_blocked_squares('R', Rank, File, State, [H|T], BlockedRes, BlockedList):-
