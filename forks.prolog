@@ -31,14 +31,33 @@ identify_forking_piece(Rank, File, ChessBoard, Forks):-
 	colour(Piece, Colour),
 	piece_real_control_squares(Piece, Rank, File, ChessBoard, CtrlSquares),
 	attacked_pieces(Colour, ChessBoard, CtrlSquares, AttackedPieces), 
-	length(AttackedPieces, NoAttackedPieces),
-	NoAttackedPieces > 1, !, 
-	forked_pieces(AttackedPieces, Forks0),
+	reverse_colour(Colour, DefColour),
+	identify_threat_on_piece_list(AttackedPieces, ChessBoard, DefColour, ThreatenedPieces), 
+	length(ThreatenedPieces, NoOfThreatenedPieces),
+	NoOfThreatenedPieces > 1, !, 
+	forked_pieces(ThreatenedPieces, Forks0),
 	index_to_square([Rank, File], Square),
-	append([[Square], [Piece], [NoAttackedPieces]], Info),
+	append([[Square], [Piece], [NoOfThreatenedPieces]], Info),
 	append(Info, Forks0, Forks).
 
 identify_forking_piece(_, _, _, []).
+
+identify_threat_on_piece_list([], _, _, []):- !.
+
+identify_threat_on_piece_list([[Piece, Rank, File]|RestAttacked], ChessBoard, Colour, [[Piece, Rank, File]|Tail]):-
+        identify_threat_on_piece(Rank, File, ChessBoard, Colour, Threats),
+        Threats = [_, _, Score],
+        Score = check, !,
+        identify_threat_on_piece_list(RestAttacked, ChessBoard, Colour, Tail).
+
+identify_threat_on_piece_list([[Piece, Rank, File]|RestAttacked], ChessBoard, Colour, [[Piece, Rank, File]|Tail]):-
+	identify_threat_on_piece(Rank, File, ChessBoard, Colour, Threats),
+	Threats = [_, _, Score], 
+	Score > 0, !,
+	identify_threat_on_piece_list(RestAttacked, ChessBoard, Colour, Tail).
+
+identify_threat_on_piece_list([_|RestAttacked], ChessBoard, Colour, ThreatenedPieces):-
+	identify_threat_on_piece_list(RestAttacked, ChessBoard, Colour, ThreatenedPieces).
 
 fix_forks([],[]).
 
