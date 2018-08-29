@@ -249,6 +249,9 @@ player_to_colour("w", white).
 player_to_colour("b", black).
 %%%%%%%%%%%%%%%%%%%  PIECE PATTERNS  %%%%%%%%%%%%%%%%%%%%%
 
+queen('Q').
+queen('q').
+
 line_piece('R').
 line_piece('r').
 line_piece('Q').
@@ -277,6 +280,45 @@ get_piece('r', rook).
 get_piece('Q', queen).
 get_piece('q', queen).
 
+%%%%%%%%%%%%%%  DIRECTION  %%%%%%%%%%%%%
+
+find_direction([Rank, File], [SmallerRank, File], north):-
+	Rank > SmallerRank, !.
+
+find_direction([Rank, File], [BiggerRank, File], south):-
+	BiggerRank > Rank, !.
+
+find_direction([Rank, File], [Rank, SmallerFile], west):-
+	File > SmallerFile, !.
+
+find_direction([Rank, File], [Rank, BiggerFile], east):-
+	BiggerFile > File, !.
+
+find_direction([Rank, File], [SmallerRank, SmallerFile], upleft):-
+	SmallerRank < Rank,
+	SmallerFile < File, 
+	Difference is Rank - SmallerRank, 
+	Difference is File - SmallerFile, !.
+
+find_direction([Rank, File], [SmallerRank, BiggerFile], upright):-
+        SmallerRank < Rank,
+	File < BiggerFile,
+	Difference is Rank - SmallerRank, 
+        Difference is BiggerFile - File, !.
+
+find_direction([Rank, File], [BiggerRank, SmallerFile], downleft):-
+        Rank < BiggerRank, 
+	SmallerFile < File,
+	Difference is BiggerRank - Rank, 
+        Difference is File - SmallerFile, !.
+
+find_direction([Rank, File], [BiggerRank, BiggerFile], downright):-
+        Rank < BiggerRank,
+	File < BiggerFile, 
+	Difference is BiggerRank - Rank, 
+        Difference is BiggerFile - File, !.
+
+find_direction(_, _, unrelated).
 
 %%%%%%%%%%%%%%  DIAGONALS AND LINES  %%%%%%%%%%%%%%%%%%%%%%%
 
