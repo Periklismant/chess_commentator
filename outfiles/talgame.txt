@@ -1,0 +1,344 @@
+[r,n,b,q,k,b,n,r]
+[p,p,p,p,p,p,p,p]
+[ , , , , , , , ]
+[ , , , , , , , ]
+[ , , , , , , , ]
+[ , , , , , , , ]
+[P,P,P,P,P,P,P,P]
+[R,N,B,Q,K,B,N,R]
+
+[r,n,b,q,k,b,n,r]
+[p,p,p,p,p,p,p,p]
+[ , , , , , , , ]
+[ , , , , , , , ]
+[ , , , ,P, , , ]
+[ , , , , , , , ]
+[P,P,P,P, ,P,P,P]
+[R,N,B,Q,K,B,N,R]
+
+PLAYER TO MOVE: black
+MATERIAL EVALUATION FOR WHITE: 39
+MATERIAL EVALUATION FOR BLACK: 39
+GAME PHASE: opening
+THREATS FOR black IN THE FORMAT [SQUARE, MATERIAL_THREATENED_TO_BE_LOST] ARE: []
+FORKS FOUND ON THE BOARD ABOVE ARE: []
+PINS:  []
+SKEWERS: []
+CENTRE CONTROL: white_controls_the_centre
+WHITE FORCES CONTROLLING THE CENTRE: 2
+BLACK FORCES CONTROLLING THE CENTRE: 0
+
+[r,n,b,q,k,b,n,r]
+[p,p,p,p,p,p, ,p]
+[ , , , , , ,p, ]
+[ , , , , , , , ]
+[ , , , ,P, , , ]
+[ , , , , , , , ]
+[P,P,P,P, ,P,P,P]
+[R,N,B,Q,K,B,N,R]
+
+PLAYER TO MOVE: white
+MATERIAL EVALUATION FOR WHITE: 39
+MATERIAL EVALUATION FOR BLACK: 39
+GAME PHASE: opening
+THREATS FOR white IN THE FORMAT [SQUARE, MATERIAL_THREATENED_TO_BE_LOST] ARE: []
+FORKS FOUND ON THE BOARD ABOVE ARE: []
+PINS:  []
+SKEWERS: []
+CENTRE CONTROL: white_controls_the_centre
+WHITE FORCES CONTROLLING THE CENTRE: 2
+BLACK FORCES CONTROLLING THE CENTRE: 0
+
+[r,n,b,q,k,b,n,r]
+[p,p,p,p,p,p, ,p]
+[ , , , , , ,p, ]
+[ , , , , , , , ]
+[ , , ,P,P, , , ]
+[ , , , , , , , ]
+[P,P,P, , ,P,P,P]
+[R,N,B,Q,K,B,N,R]
+
+PLAYER TO MOVE: black
+MATERIAL EVALUATION FOR WHITE: 39
+MATERIAL EVALUATION FOR BLACK: 39
+GAME PHASE: opening
+THREATS FOR black IN THE FORMAT [SQUARE, MATERIAL_THREATENED_TO_BE_LOST] ARE: []
+FORKS FOUND ON THE BOARD ABOVE ARE: []
+PINS:  []
+SKEWERS: []
+CENTRE CONTROL: white_controls_the_centre
+WHITE FORCES CONTROLLING THE CENTRE: 5
+BLACK FORCES CONTROLLING THE CENTRE: 0
+
+[r,n,b,q,k, ,n,r]
+[p,p,p,p,p,p,b,p]
+[ , , , , , ,p, ]
+[ , , , , , , , ]
+[ , , ,P,P, , , ]
+[ , , , , , , , ]
+[P,P,P, , ,P,P,P]
+[R,N,B,Q,K,B,N,R]
+
+PLAYER TO MOVE: white
+MATERIAL EVALUATION FOR WHITE: 39
+MATERIAL EVALUATION FOR BLACK: 39
+GAME PHASE: opening
+THREATS FOR white IN THE FORMAT [SQUARE, MATERIAL_THREATENED_TO_BE_LOST] ARE: []
+FORKS FOUND ON THE BOARD ABOVE ARE: []
+PINS:  []
+SKEWERS: []
+CENTRE CONTROL: white_controls_the_centre
+WHITE FORCES CONTROLLING THE CENTRE: 5
+BLACK FORCES CONTROLLING THE CENTRE: 2
+
+[r,n,b,q,k, ,n,r]
+[p,p,p,p,p,p,b,p]
+[ , , , , , ,p, ]
+[ , , , , , , , ]
+[ , , ,P,P, , , ]
+[ , ,N, , , , , ]
+[P,P,P, , ,P,P,P]
+[R, ,B,Q,K,B,N,R]
+
+PLAYER TO MOVE: black
+MATERIAL EVALUATION FOR WHITE: 39
+MATERIAL EVALUATION FOR BLACK: 39
+GAME PHASE: opening
+THREATS FOR black IN THE FORMAT [SQUARE, MATERIAL_THREATENED_TO_BE_LOST] ARE: []
+FORKS FOUND ON THE BOARD ABOVE ARE: []
+PINS:  [[[g7,[P,N,relativePin]]]]
+SKEWERS: []
+CENTRE CONTROL: white_controls_the_centre
+WHITE FORCES CONTROLLING THE CENTRE: 7
+BLACK FORCES CONTROLLING THE CENTRE: 2
+
+[r,n,b,q,k, ,n,r]
+[p,p,p, ,p,p,b,p]
+[ , , ,p, , ,p, ]
+[ , , , , , , , ]
+[ , , ,P,P, , , ]
+[ , ,N, , , , , ]
+[P,P,P, , ,P,P,P]
+[R, ,B,Q,K,B,N,R]
+
+PLAYER TO MOVE: white
+MATERIAL EVALUATION FOR WHITE: 39
+MATERIAL EVALUATION FOR BLACK: 39
+GAME PHASE: opening
+THREATS FOR white IN THE FORMAT [SQUARE, MATERIAL_THREATENED_TO_BE_LOST] ARE: []
+FORKS FOUND ON THE BOARD ABOVE ARE: []
+PINS:  [[[g7,[P,N,relativePin]]]]
+SKEWERS: []
+CENTRE CONTROL: white_controls_the_centre
+WHITE FORCES CONTROLLING THE CENTRE: 7
+BLACK FORCES CONTROLLING THE CENTRE: 3
+
+[r,n,b,q,k, ,n,r]
+[p,p,p, ,p,p,b,p]
+[ , , ,p, , ,p, ]
+[ , , , , , , , ]
+[ , , ,P,P, , , ]
+[ , ,N, , ,N, , ]
+[P,P,P, , ,P,P,P]
+[R, ,B,Q,K,B, ,R]
+
+PLAYER TO MOVE: black
+MATERIAL EVALUATION FOR WHITE: 39
+MATERIAL EVALUATION FOR BLACK: 39
+GAME PHASE: opening
+THREATS FOR black IN THE FORMAT [SQUARE, MATERIAL_THREATENED_TO_BE_LOST] ARE: []
+FORKS FOUND ON THE BOARD ABOVE ARE: []
+PINS:  [[[g7,[P,N,relativePin]]]]
+SKEWERS: []
+CENTRE CONTROL: white_controls_the_centre
+WHITE FORCES CONTROLLING THE CENTRE: 9
+BLACK FORCES CONTROLLING THE CENTRE: 3
+
+[r,n,b,q,k, ,n,r]
+[p,p, , ,p,p,b,p]
+[ , ,p,p, , ,p, ]
+[ , , , , , , , ]
+[ , , ,P,P, , , ]
+[ , ,N, , ,N, , ]
+[P,P,P, , ,P,P,P]
+[R, ,B,Q,K,B, ,R]
+
+PLAYER TO MOVE: white
+MATERIAL EVALUATION FOR WHITE: 39
+MATERIAL EVALUATION FOR BLACK: 39
+GAME PHASE: opening
+THREATS FOR white IN THE FORMAT [SQUARE, MATERIAL_THREATENED_TO_BE_LOST] ARE: []
+FORKS FOUND ON THE BOARD ABOVE ARE: []
+PINS:  [[[g7,[P,N,relativePin]]]]
+SKEWERS: []
+CENTRE CONTROL: white_controls_the_centre
+WHITE FORCES CONTROLLING THE CENTRE: 9
+BLACK FORCES CONTROLLING THE CENTRE: 4
+
+[r,n,b,q,k, ,n,r]
+[p,p, , ,p,p,b,p]
+[ , ,p,p, , ,p, ]
+[ , , , , , ,B, ]
+[ , , ,P,P, , , ]
+[ , ,N, , ,N, , ]
+[P,P,P, , ,P,P,P]
+[R, , ,Q,K,B, ,R]
+
+PLAYER TO MOVE: black
+MATERIAL EVALUATION FOR WHITE: 39
+MATERIAL EVALUATION FOR BLACK: 39
+GAME PHASE: opening
+THREATS FOR black IN THE FORMAT [SQUARE, MATERIAL_THREATENED_TO_BE_LOST] ARE: []
+FORKS FOUND ON THE BOARD ABOVE ARE: []
+PINS:  [[[g7,[P,N,relativePin]]],[[g5,[p,q,relativePin]]]]
+SKEWERS: []
+CENTRE CONTROL: white_controls_the_centre
+WHITE FORCES CONTROLLING THE CENTRE: 9
+BLACK FORCES CONTROLLING THE CENTRE: 4
+
+[r,n,b, ,k, ,n,r]
+[p,p, , ,p,p,b,p]
+[ ,q,p,p, , ,p, ]
+[ , , , , , ,B, ]
+[ , , ,P,P, , , ]
+[ , ,N, , ,N, , ]
+[P,P,P, , ,P,P,P]
+[R, , ,Q,K,B, ,R]
+
+PLAYER TO MOVE: white
+MATERIAL EVALUATION FOR WHITE: 39
+MATERIAL EVALUATION FOR BLACK: 39
+GAME PHASE: opening
+THREATS FOR white IN THE FORMAT [SQUARE, MATERIAL_THREATENED_TO_BE_LOST] ARE: [[b2,1]]
+FORKS FOUND ON THE BOARD ABOVE ARE: [[[b6,q,2,[d4,P],[b2,P]]]]
+PINS:  [[[g7,[P,N,relativePin]]]]
+SKEWERS: []
+CENTRE CONTROL: white_controls_the_centre
+WHITE FORCES CONTROLLING THE CENTRE: 9
+BLACK FORCES CONTROLLING THE CENTRE: 5
+
+[r,n,b, ,k, ,n,r]
+[p,p, , ,p,p,b,p]
+[ ,q,p,p, , ,p, ]
+[ , , , , , ,B, ]
+[ , , ,P,P, , , ]
+[ , ,N, , ,N, , ]
+[P,P,P,Q, ,P,P,P]
+[R, , , ,K,B, ,R]
+
+PLAYER TO MOVE: black
+MATERIAL EVALUATION FOR WHITE: 39
+MATERIAL EVALUATION FOR BLACK: 39
+GAME PHASE: opening
+THREATS FOR black IN THE FORMAT [SQUARE, MATERIAL_THREATENED_TO_BE_LOST] ARE: []
+FORKS FOUND ON THE BOARD ABOVE ARE: [[[b6,q,2,[d4,P],[b2,P]]]]
+PINS:  [[[g7,[P,N,relativePin]]]]
+SKEWERS: []
+CENTRE CONTROL: white_controls_the_centre
+WHITE FORCES CONTROLLING THE CENTRE: 9
+BLACK FORCES CONTROLLING THE CENTRE: 5
+
+[r,n,b, ,k, ,n,r]
+[p,p, , ,p,p,b,p]
+[ , ,p,p, , ,p, ]
+[ , , , , , ,B, ]
+[ , , ,P,P, , , ]
+[ , ,N, , ,N, , ]
+[P,q,P,Q, ,P,P,P]
+[R, , , ,K,B, ,R]
+
+PLAYER TO MOVE: white
+MATERIAL EVALUATION FOR WHITE: 38
+MATERIAL EVALUATION FOR BLACK: 39
+GAME PHASE: opening
+THREATS FOR white IN THE FORMAT [SQUARE, MATERIAL_THREATENED_TO_BE_LOST] ARE: [[a1,5]]
+FORKS FOUND ON THE BOARD ABOVE ARE: [[[b2,q,4,[c3,N],[a1,R],[a2,P],[c2,P]]]]
+PINS:  [[[g7,[P,N,relativePin]]]]
+SKEWERS: [[[b2,[N,P,relativePin]]]]
+CENTRE CONTROL: white_controls_the_centre
+WHITE FORCES CONTROLLING THE CENTRE: 9
+BLACK FORCES CONTROLLING THE CENTRE: 4
+
+[r,n,b, ,k, ,n,r]
+[p,p, , ,p,p,b,p]
+[ , ,p,p, , ,p, ]
+[ , , , , , ,B, ]
+[ , , ,P,P, , , ]
+[ , ,N, , ,N, , ]
+[P,q,P,Q, ,P,P,P]
+[ ,R, , ,K,B, ,R]
+
+PLAYER TO MOVE: black
+MATERIAL EVALUATION FOR WHITE: 38
+MATERIAL EVALUATION FOR BLACK: 39
+GAME PHASE: opening
+THREATS FOR black IN THE FORMAT [SQUARE, MATERIAL_THREATENED_TO_BE_LOST] ARE: [[b2,9]]
+FORKS FOUND ON THE BOARD ABOVE ARE: [[[b2,q,4,[c3,N],[a2,P],[c2,P],[b1,R]]]]
+PINS:  [[[g7,[P,N,relativePin]]]]
+SKEWERS: [[[b2,[N,P,relativePin]]],[[b1,[q,p,relativeSkewer]]]]
+CENTRE CONTROL: white_controls_the_centre
+WHITE FORCES CONTROLLING THE CENTRE: 9
+BLACK FORCES CONTROLLING THE CENTRE: 4
+
+[r,n,b, ,k, ,n,r]
+[p,p, , ,p,p,b,p]
+[ , ,p,p, , ,p, ]
+[ , , , , , ,B, ]
+[ , , ,P,P, , , ]
+[q, ,N, , ,N, , ]
+[P, ,P,Q, ,P,P,P]
+[ ,R, , ,K,B, ,R]
+
+PLAYER TO MOVE: white
+MATERIAL EVALUATION FOR WHITE: 38
+MATERIAL EVALUATION FOR BLACK: 39
+GAME PHASE: opening
+THREATS FOR white IN THE FORMAT [SQUARE, MATERIAL_THREATENED_TO_BE_LOST] ARE: []
+FORKS FOUND ON THE BOARD ABOVE ARE: [[[a3,q,2,[c3,N],[a2,P]]]]
+PINS:  [[[g7,[P,N,relativePin]]],[[b1,[p,n,relativePin]]]]
+SKEWERS: []
+CENTRE CONTROL: white_controls_the_centre
+WHITE FORCES CONTROLLING THE CENTRE: 9
+BLACK FORCES CONTROLLING THE CENTRE: 4
+
+[r,n,b, ,k, ,n,r]
+[p,p, , ,p,p,b,p]
+[ , ,p,p, , ,p, ]
+[ , , , , , ,B, ]
+[ , ,B,P,P, , , ]
+[q, ,N, , ,N, , ]
+[P, ,P,Q, ,P,P,P]
+[ ,R, , ,K, , ,R]
+
+PLAYER TO MOVE: black
+MATERIAL EVALUATION FOR WHITE: 38
+MATERIAL EVALUATION FOR BLACK: 39
+GAME PHASE: opening
+THREATS FOR black IN THE FORMAT [SQUARE, MATERIAL_THREATENED_TO_BE_LOST] ARE: []
+FORKS FOUND ON THE BOARD ABOVE ARE: [[[a3,q,2,[c3,N],[a2,P]]]]
+PINS:  [[[g7,[P,N,relativePin]]],[[c4,[p,n,relativePin]]],[[b1,[p,n,relativePin]]]]
+SKEWERS: []
+CENTRE CONTROL: white_controls_the_centre
+WHITE FORCES CONTROLLING THE CENTRE: 10
+BLACK FORCES CONTROLLING THE CENTRE: 4
+
+[r,n,b, ,k, ,n,r]
+[p,p, , ,p,p,b,p]
+[ , ,p,p, , ,p, ]
+[q, , , , , ,B, ]
+[ , ,B,P,P, , , ]
+[ , ,N, , ,N, , ]
+[P, ,P,Q, ,P,P,P]
+[ ,R, , ,K, , ,R]
+
+PLAYER TO MOVE: white
+MATERIAL EVALUATION FOR WHITE: 38
+MATERIAL EVALUATION FOR BLACK: 39
+GAME PHASE: opening
+THREATS FOR white IN THE FORMAT [SQUARE, MATERIAL_THREATENED_TO_BE_LOST] ARE: []
+FORKS FOUND ON THE BOARD ABOVE ARE: [[[a5,q,3,[c3,N],[g5,B],[a2,P]]]]
+PINS:  [[[g7,[P,N,relativePin]]],[[a5,[N,Q,relativePin]]],[[c4,[p,n,relativePin]]],[[b1,[p,n,relativePin]]]]
+SKEWERS: []
+CENTRE CONTROL: white_controls_the_centre
+WHITE FORCES CONTROLLING THE CENTRE: 10
+BLACK FORCES CONTROLLING THE CENTRE: 6
