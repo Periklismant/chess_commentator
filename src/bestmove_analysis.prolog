@@ -14,7 +14,7 @@
 %%%%%%%%%%%%%%%%%%%      ChessBoard States     %%%%%%%%%%%%%%%%%%%%%
 
 play_moves(InputFEN, /*Stockfish_Outfile,*/ Moves, [State | NextStates], Pins, Centre, Outfile):-
-	initialize_state(InputFEN, State, Next_to_Play, Castling, EnPassantEarly, HalfMoves, FullMoves0),
+	initialize_state(InputFEN, State, Next_to_Play, Castling, EnPassantEarly, _HalfMoves, FullMoves0),
 	%get_best_line(Stockfish_Outfile, Moves),
 	atom_number(FullMoves0, FullMoves),
 	string_chars(Castling, CastlingList),
@@ -31,9 +31,9 @@ play_next_moves(_,[],[], _, _, _, _, [],[],_):- !.
 
 play_next_moves(State, [Move | NextMoves], [NewState | NextStates], MoveCount, Next_Colour, CastlingList, EnPassant, [Pins | NextPins], [[Side, Pieces_on_Centre_Squares, Pieces_Controlling_the_Centre, WhiteScoreCentre, BlackScoreCentre] | NextCentre], Stream):-
 	string_chars(Move, ParsedMove), 
-        fix_indexes(ParsedMove, [OldRank, OldFile, NewRank, NewFile]),
-        identify_piece([OldRank, OldFile, NewRank, NewFile], State, Piece,_,_),
-        play_move(State, [OldRank, OldFile, NewRank, NewFile], Piece, NewState, CastlingList, NewCastlingList, EnPassant, NewEnPassant),
+	fix_indexes(ParsedMove, [OldRank, OldFile, NewRank, NewFile]),
+	identify_piece([OldRank, OldFile, NewRank, NewFile], State, Piece,_,_),
+	play_move(State, [OldRank, OldFile, NewRank, NewFile], Piece, NewState, CastlingList, NewCastlingList, EnPassant, NewEnPassant),
 	NewMoveCount is MoveCount + 1,
 	material_evaluation(NewState, 0, 0, WhiteScore, BlackScore),
 	identify_game_phase(NewState, NewMoveCount, GamePhase),

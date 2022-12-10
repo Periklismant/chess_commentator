@@ -5,6 +5,8 @@
 
 %%%%%%%%%%    FORKS     %%%%%%%%%% 
 
+%identify_forks(+ChessBoard, -Forks)
+% 
 identify_forks(ChessBoard, Forks):-
 	identify_chessboard_forks(0, ChessBoard, Forks0),
 	fix_forks(Forks0, Forks).
